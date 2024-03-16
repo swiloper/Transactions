@@ -9,21 +9,27 @@
 /* Begin PBXBuildFile section */
 		F4BFAFFF2BA5B684008F7ACE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */; };
 		F4BFB0012BA5B684008F7ACE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */; };
-		F4BFB0032BA5B684008F7ACE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0022BA5B684008F7ACE /* ViewController.swift */; };
-		F4BFB0062BA5B684008F7ACE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4BFB0042BA5B684008F7ACE /* Main.storyboard */; };
+		F4BFB0032BA5B684008F7ACE /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0022BA5B684008F7ACE /* MainViewController.swift */; };
 		F4BFB0082BA5B686008F7ACE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4BFB0072BA5B686008F7ACE /* Assets.xcassets */; };
 		F4BFB00B2BA5B686008F7ACE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4BFB0092BA5B686008F7ACE /* LaunchScreen.storyboard */; };
+		F4BFB0152BA5E4E6008F7ACE /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0142BA5E4E6008F7ACE /* NetworkService.swift */; };
+		F4BFB0172BA5F2F2008F7ACE /* EndpointPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0162BA5F2F2008F7ACE /* EndpointPath.swift */; };
+		F4BFB01B2BA5F344008F7ACE /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB01A2BA5F344008F7ACE /* Extensions.swift */; };
+		F4BFB0202BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB01F2BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F4BFAFFB2BA5B684008F7ACE /* Transactions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transactions.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		F4BFB0022BA5B684008F7ACE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		F4BFB0052BA5B684008F7ACE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		F4BFB0022BA5B684008F7ACE /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		F4BFB0072BA5B686008F7ACE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4BFB00A2BA5B686008F7ACE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F4BFB00C2BA5B686008F7ACE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F4BFB0142BA5E4E6008F7ACE /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		F4BFB0162BA5F2F2008F7ACE /* EndpointPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointPath.swift; sourceTree = "<group>"; };
+		F4BFB01A2BA5F344008F7ACE /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		F4BFB01F2BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinCurrentPriceResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,15 +62,66 @@
 		F4BFAFFD2BA5B684008F7ACE /* Transactions */ = {
 			isa = PBXGroup;
 			children = (
-				F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */,
-				F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */,
-				F4BFB0022BA5B684008F7ACE /* ViewController.swift */,
-				F4BFB0042BA5B684008F7ACE /* Main.storyboard */,
+				F4BFB0212BA5F3C9008F7ACE /* Delegates */,
+				F4BFB0182BA5F2FC008F7ACE /* Network */,
+				F4BFB01E2BA5F389008F7ACE /* Models */,
+				F4BFB0222BA5F3D7008F7ACE /* Controllers */,
+				F4BFB0192BA5F335008F7ACE /* Helpers */,
+				F4BFB0232BA5F3E2008F7ACE /* Launch */,
 				F4BFB0072BA5B686008F7ACE /* Assets.xcassets */,
-				F4BFB0092BA5B686008F7ACE /* LaunchScreen.storyboard */,
 				F4BFB00C2BA5B686008F7ACE /* Info.plist */,
 			);
 			path = Transactions;
+			sourceTree = "<group>";
+		};
+		F4BFB0182BA5F2FC008F7ACE /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFB0162BA5F2F2008F7ACE /* EndpointPath.swift */,
+				F4BFB0142BA5E4E6008F7ACE /* NetworkService.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		F4BFB0192BA5F335008F7ACE /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFB01A2BA5F344008F7ACE /* Extensions.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		F4BFB01E2BA5F389008F7ACE /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFB01F2BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F4BFB0212BA5F3C9008F7ACE /* Delegates */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */,
+				F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */,
+			);
+			path = Delegates;
+			sourceTree = "<group>";
+		};
+		F4BFB0222BA5F3D7008F7ACE /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFB0022BA5B684008F7ACE /* MainViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		F4BFB0232BA5F3E2008F7ACE /* Launch */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFB0092BA5B686008F7ACE /* LaunchScreen.storyboard */,
+			);
+			path = Launch;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -127,7 +184,6 @@
 			files = (
 				F4BFB00B2BA5B686008F7ACE /* LaunchScreen.storyboard in Resources */,
 				F4BFB0082BA5B686008F7ACE /* Assets.xcassets in Resources */,
-				F4BFB0062BA5B684008F7ACE /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,23 +194,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4BFB0032BA5B684008F7ACE /* ViewController.swift in Sources */,
+				F4BFB0032BA5B684008F7ACE /* MainViewController.swift in Sources */,
+				F4BFB01B2BA5F344008F7ACE /* Extensions.swift in Sources */,
 				F4BFAFFF2BA5B684008F7ACE /* AppDelegate.swift in Sources */,
+				F4BFB0202BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift in Sources */,
+				F4BFB0152BA5E4E6008F7ACE /* NetworkService.swift in Sources */,
 				F4BFB0012BA5B684008F7ACE /* SceneDelegate.swift in Sources */,
+				F4BFB0172BA5F2F2008F7ACE /* EndpointPath.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		F4BFB0042BA5B684008F7ACE /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F4BFB0052BA5B684008F7ACE /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		F4BFB0092BA5B686008F7ACE /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -297,7 +349,6 @@
 				INFOPLIST_FILE = Transactions/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -325,7 +376,6 @@
 				INFOPLIST_FILE = Transactions/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
