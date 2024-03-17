@@ -16,6 +16,12 @@
 		F4BFB0172BA5F2F2008F7ACE /* EndpointPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0162BA5F2F2008F7ACE /* EndpointPath.swift */; };
 		F4BFB01B2BA5F344008F7ACE /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB01A2BA5F344008F7ACE /* Extensions.swift */; };
 		F4BFB0202BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB01F2BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift */; };
+		F4BFB0272BA60D43008F7ACE /* Transactions.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0252BA60D43008F7ACE /* Transactions.xcdatamodeld */; };
+		F4BFB02A2BA6105B008F7ACE /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0282BA6105B008F7ACE /* Transaction.swift */; };
+		F4BFB0502BA6126C008F7ACE /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB04F2BA6126C008F7ACE /* Category.swift */; };
+		F4BFB0532BA62639008F7ACE /* BalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0522BA62639008F7ACE /* BalanceView.swift */; };
+		F4BFB0552BA70252008F7ACE /* SubtitleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0542BA70252008F7ACE /* SubtitleTableViewCell.swift */; };
+		F4BFB0572BA70260008F7ACE /* GroupedSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0562BA70260008F7ACE /* GroupedSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +36,12 @@
 		F4BFB0162BA5F2F2008F7ACE /* EndpointPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointPath.swift; sourceTree = "<group>"; };
 		F4BFB01A2BA5F344008F7ACE /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		F4BFB01F2BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinCurrentPriceResponse.swift; sourceTree = "<group>"; };
+		F4BFB0262BA60D43008F7ACE /* Transactions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Transactions.xcdatamodel; sourceTree = "<group>"; };
+		F4BFB0282BA6105B008F7ACE /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		F4BFB04F2BA6126C008F7ACE /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		F4BFB0522BA62639008F7ACE /* BalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceView.swift; sourceTree = "<group>"; };
+		F4BFB0542BA70252008F7ACE /* SubtitleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleTableViewCell.swift; sourceTree = "<group>"; };
+		F4BFB0562BA70260008F7ACE /* GroupedSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +77,9 @@
 				F4BFB0212BA5F3C9008F7ACE /* Delegates */,
 				F4BFB0182BA5F2FC008F7ACE /* Network */,
 				F4BFB01E2BA5F389008F7ACE /* Models */,
+				F4BFB0512BA625E0008F7ACE /* Views */,
 				F4BFB0222BA5F3D7008F7ACE /* Controllers */,
+				F4BFB0242BA60D1E008F7ACE /* Storage */,
 				F4BFB0192BA5F335008F7ACE /* Helpers */,
 				F4BFB0232BA5F3E2008F7ACE /* Launch */,
 				F4BFB0072BA5B686008F7ACE /* Assets.xcassets */,
@@ -94,6 +108,8 @@
 		F4BFB01E2BA5F389008F7ACE /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F4BFB04F2BA6126C008F7ACE /* Category.swift */,
+				F4BFB0562BA70260008F7ACE /* GroupedSection.swift */,
 				F4BFB01F2BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift */,
 			);
 			path = Models;
@@ -122,6 +138,24 @@
 				F4BFB0092BA5B686008F7ACE /* LaunchScreen.storyboard */,
 			);
 			path = Launch;
+			sourceTree = "<group>";
+		};
+		F4BFB0242BA60D1E008F7ACE /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFB0282BA6105B008F7ACE /* Transaction.swift */,
+				F4BFB0252BA60D43008F7ACE /* Transactions.xcdatamodeld */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		F4BFB0512BA625E0008F7ACE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F4BFB0522BA62639008F7ACE /* BalanceView.swift */,
+				F4BFB0542BA70252008F7ACE /* SubtitleTableViewCell.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,10 +229,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4BFB0032BA5B684008F7ACE /* MainViewController.swift in Sources */,
+				F4BFB0502BA6126C008F7ACE /* Category.swift in Sources */,
+				F4BFB0532BA62639008F7ACE /* BalanceView.swift in Sources */,
 				F4BFB01B2BA5F344008F7ACE /* Extensions.swift in Sources */,
+				F4BFB0272BA60D43008F7ACE /* Transactions.xcdatamodeld in Sources */,
 				F4BFAFFF2BA5B684008F7ACE /* AppDelegate.swift in Sources */,
+				F4BFB02A2BA6105B008F7ACE /* Transaction.swift in Sources */,
 				F4BFB0202BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift in Sources */,
 				F4BFB0152BA5E4E6008F7ACE /* NetworkService.swift in Sources */,
+				F4BFB0552BA70252008F7ACE /* SubtitleTableViewCell.swift in Sources */,
+				F4BFB0572BA70260008F7ACE /* GroupedSection.swift in Sources */,
 				F4BFB0012BA5B684008F7ACE /* SceneDelegate.swift in Sources */,
 				F4BFB0172BA5F2F2008F7ACE /* EndpointPath.swift in Sources */,
 			);
@@ -413,6 +453,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		F4BFB0252BA60D43008F7ACE /* Transactions.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				F4BFB0262BA60D43008F7ACE /* Transactions.xcdatamodel */,
+			);
+			currentVersion = F4BFB0262BA60D43008F7ACE /* Transactions.xcdatamodel */;
+			path = Transactions.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = F4BFAFF32BA5B684008F7ACE /* Project object */;
 }

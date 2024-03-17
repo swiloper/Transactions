@@ -9,6 +9,31 @@ import UIKit
 
 final class MainViewController: UIViewController {
     
+    // MARK: - Properties
+    
+    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    private var sections = [GroupedSection<Date, Transaction>]()
+    
+    // MARK: - TableView
+    
+    private let tableView: UITableView = {
+        let table = UITableView(frame: .zero, style: .grouped)
+        table.register(SubtitleTableViewCell.self, forCellReuseIdentifier: "Cell")
+        table.translatesAutoresizingMaskIntoConstraints = false
+        return table
+    }()
+    
+    // MARK: - EmptyView
+    
+    private let contentUnavailableView: UIContentUnavailableView = {
+        var configuration = UIContentUnavailableConfiguration.empty()
+        configuration.image = UIImage(systemName: "list.bullet")
+        configuration.text = "Empty"
+        configuration.secondaryText = "List of expenses and incomes is empty, you can add a transaction by clicking on the corresponding button above."
+        return UIContentUnavailableView(configuration: configuration)
+    }()
+    
     // MARK: - BitcoinCurrentRateLabel
     
     private let bitcoinCurrentRateLabel: UILabel = {
@@ -29,6 +54,8 @@ final class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        constraints()
+        fetchAllTransactions()
     }
     
     // MARK: - viewDidAppear
@@ -47,8 +74,13 @@ final class MainViewController: UIViewController {
     
     /// Setups view and navigation bar appearance.
     private func setup() {
-        view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateLabel)
+        view.backgroundColor = .systemBackground
+        view.addSubview(tableView)
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.tableHeaderView = BalanceView(frame: CGRect(origin: .zero, size: CGSize(width: view.frame.width, height: 145)))
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -57,17 +89,24 @@ final class MainViewController: UIViewController {
         navigationItem.compactAppearance = appearance
     }
     
+    // MARK: - Constraints
+    
+    private func constraints() {
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
     // MARK: - IsPriceShouldBeUpdated
     
     /// Checks if Bitcoin price needs to be updated based on last update time.
     private func isPriceShouldBeUpdated() -> Bool {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd, yyyy HH:mm:ss zzz"
-        
-        if let updated = UserDefaults.standard.string(forKey: UserDefaults.Keys.lastPriceUpdate.rawValue), let date = formatter.date(from: updated) {
-            let now = Date()
+        if let updated = UserDefaults.standard.string(forKey: UserDefaults.Keys.lastPriceUpdate.rawValue), let date = DateFormatter.full.date(from: updated) {
             let calendar = Calendar.current
-            let components = calendar.dateComponents([.hour], from: date, to: now)
+            let components = calendar.dateComponents([.hour], from: date, to: Date.now)
             
             // Allows updating the Bitcoin price only if the last rate update time value is present in user defaults and the difference between it and the current time is more than one hour.
             if let hours = components.hour {
@@ -108,5 +147,95 @@ final class MainViewController: UIViewController {
     private func save(_ rate: String? = nil, _ updated: String? = nil) {
         UserDefaults.standard.set(rate, forKey: UserDefaults.Keys.bitcoinRate.rawValue)
         UserDefaults.standard.set(updated, forKey: UserDefaults.Keys.lastPriceUpdate.rawValue)
+    }
+}
+
+// MARK: - Table
+
+extension MainViewController: UITableViewDelegate, UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        sections.count
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        55
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        DateFormatter.dayMonthYear.string(from: sections[section].headline)
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        sections[section].rows.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let transaction = sections[indexPath.section].rows[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        var configuration = cell.defaultContentConfiguration()
+        
+        if let value = transaction.category, let category = Category(rawValue: value), let date = transaction.date {
+            configuration.image = UIImage(systemName: category.icon)
+            configuration.imageProperties.tintColor = category.color
+            configuration.secondaryText = "\(value.capitalized) · \(DateFormatter.time.string(from: date))"
+        }
+        
+        configuration.text = "\(transaction.amount) BTC"
+        configuration.textToSecondaryTextVerticalPadding = 2
+        configuration.secondaryTextProperties.color = .gray
+        
+        cell.contentConfiguration = configuration
+        
+        return cell
+    }
+}
+
+// MARK: - Transactions
+
+extension MainViewController {
+    
+    // MARK: - Fetch
+    
+    private func fetchAllTransactions() {
+        do {
+            let transactions = try context.fetch(Transaction.fetchRequest())
+            
+            sections = GroupedSection.group(rows: transactions) {
+                guard let from = $0.date, let day = Date.day(from: from) else { return Date.now }
+                return day
+            } sorted: {
+                guard let first = $0.date, let second = $1.date else { return false }
+                return first > second
+            }
+
+            sections.sort(by: { $0.headline > $1.headline })
+            
+            tableView.backgroundView = sections.isEmpty ? contentUnavailableView : nil
+            tableView.isScrollEnabled = !sections.isEmpty
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    // MARK: - Add
+    
+    private func addTransaction(amount: Double, category: Category) {
+        let new = Transaction(context: context)
+        new.id = UUID().uuidString
+        new.amount = amount
+        new.category = category.rawValue
+        new.date = Date.now
+        
+        do {
+            try context.save()
+            fetchAllTransactions()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }
