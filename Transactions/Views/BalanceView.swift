@@ -15,7 +15,7 @@ final class BalanceView: UIView {
         stack(axis: .vertical)
     }()
     
-    let balanceLabel: UILabel = {
+    private let balanceLabel: UILabel = {
         let label = UILabel()
         label.text = "Balance"
         label.textColor = .gray
@@ -24,7 +24,7 @@ final class BalanceView: UIView {
         return label
     }()
     
-    let bitcoinAmountLabel: UILabel = {
+    private let bitcoinAmountLabel: UILabel = {
         let label = UILabel()
         label.text = "0.000461 BTC"
         label.font = .systemFont(ofSize: 24, weight: .semibold)
@@ -36,7 +36,7 @@ final class BalanceView: UIView {
         stack(axis: .horizontal, spacing: 12)
     }()
     
-    let replenishBitcoinsButton: UIButton = {
+    private let replenishBitcoinsButton: UIButton = {
         var configuration = UIButton.Configuration.filled()
         configuration.cornerStyle = .medium
         
@@ -75,7 +75,6 @@ final class BalanceView: UIView {
         
         configuration.image = UIImage(systemName: "plus.circle")
         configuration.imagePadding = 6
-        configuration.imagePlacement = .leading
         configuration.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
         
         configuration.title = "Add transaction"

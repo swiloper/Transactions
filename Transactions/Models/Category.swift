@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum Category: String {
+enum Category: String, CaseIterable {
     case groceries, taxi, electronics, restaurant, other
     
     /// Name of the category system icon.

@@ -7,13 +7,17 @@
 
 import UIKit
 
-final class MainViewController: UIViewController {
+final class MainViewController: UIViewController, AddTransactionDelegate {
     
     // MARK: - Properties
     
     private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     private var sections = [GroupedSection<Date, Transaction>]()
+    
+    // MARK: - BalanceView
+    
+    private let balanceView = BalanceView(frame: CGRect(origin: .zero, size: CGSize(width: .zero, height: 145)))
     
     // MARK: - TableView
     
@@ -78,9 +82,18 @@ final class MainViewController: UIViewController {
         view.backgroundColor = .systemBackground
         view.addSubview(tableView)
         
+        balanceView.frame.size.width = view.frame.width
+        balanceView.addTransactionButton.addAction(
+            UIAction { _ in
+                let addTransactionViewController = AddTransactionViewController()
+                addTransactionViewController.delegate = self
+                self.navigationController?.pushViewController(addTransactionViewController, animated: true)
+            }, for: .touchUpInside
+        )
+        
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.tableHeaderView = BalanceView(frame: CGRect(origin: .zero, size: CGSize(width: view.frame.width, height: 145)))
+        tableView.tableHeaderView = balanceView
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -224,7 +237,7 @@ extension MainViewController {
     
     // MARK: - Add
     
-    private func addTransaction(amount: Double, category: Category) {
+    func addTransaction(amount: Double, category: Category) {
         let new = Transaction(context: context)
         new.id = UUID().uuidString
         new.amount = amount

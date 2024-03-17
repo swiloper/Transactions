@@ -22,6 +22,7 @@
 		F4BFB0532BA62639008F7ACE /* BalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0522BA62639008F7ACE /* BalanceView.swift */; };
 		F4BFB0552BA70252008F7ACE /* SubtitleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0542BA70252008F7ACE /* SubtitleTableViewCell.swift */; };
 		F4BFB0572BA70260008F7ACE /* GroupedSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0562BA70260008F7ACE /* GroupedSection.swift */; };
+		F4BFB0592BA76D47008F7ACE /* AddTransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0582BA76D47008F7ACE /* AddTransactionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		F4BFB0522BA62639008F7ACE /* BalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceView.swift; sourceTree = "<group>"; };
 		F4BFB0542BA70252008F7ACE /* SubtitleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleTableViewCell.swift; sourceTree = "<group>"; };
 		F4BFB0562BA70260008F7ACE /* GroupedSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedSection.swift; sourceTree = "<group>"; };
+		F4BFB0582BA76D47008F7ACE /* AddTransactionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				F4BFB0022BA5B684008F7ACE /* MainViewController.swift */,
+				F4BFB0582BA76D47008F7ACE /* AddTransactionViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -233,6 +236,7 @@
 				F4BFB0532BA62639008F7ACE /* BalanceView.swift in Sources */,
 				F4BFB01B2BA5F344008F7ACE /* Extensions.swift in Sources */,
 				F4BFB0272BA60D43008F7ACE /* Transactions.xcdatamodeld in Sources */,
+				F4BFB0592BA76D47008F7ACE /* AddTransactionViewController.swift in Sources */,
 				F4BFAFFF2BA5B684008F7ACE /* AppDelegate.swift in Sources */,
 				F4BFB02A2BA6105B008F7ACE /* Transaction.swift in Sources */,
 				F4BFB0202BA5F38F008F7ACE /* BitcoinCurrentPriceResponse.swift in Sources */,
