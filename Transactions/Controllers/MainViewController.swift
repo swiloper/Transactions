@@ -11,7 +11,7 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
     
     // MARK: - Properties
     
-    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    private let context = StorageService.shared.persistentContainer.viewContext
     
     /// Specifies the number of transactions that should be fetched from the storage at a time.
     private var paginationLimit: Int = 20
@@ -34,38 +34,39 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
     
     private let balanceView = BalanceView(frame: CGRect(origin: .zero, size: CGSize(width: .zero, height: 145)))
     
-    // MARK: - TableView
+    // MARK: - TransactionTableView
     
-    private let tableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .grouped)
-        table.register(SubtitleTableViewCell.self, forCellReuseIdentifier: "Cell")
-        table.translatesAutoresizingMaskIntoConstraints = false
-        return table
+    private let transactionTableView: UITableView = {
+        let tableView = UITableView(frame: .zero, style: .grouped)
+        tableView.register(SubtitleTableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        return tableView
     }()
     
-    // MARK: - EmptyView
+    // MARK: - ContentUnavailableEmptyView
     
-    private let contentUnavailableView: UIContentUnavailableView = {
+    private let contentUnavailableEmptyView: UIContentUnavailableView = {
         var configuration = UIContentUnavailableConfiguration.empty()
         configuration.image = UIImage(systemName: "list.bullet")
         configuration.text = "Empty"
         configuration.secondaryText = "List of expenses and incomes is empty, you can add a transaction by clicking on the corresponding button above."
+        configuration.textToSecondaryTextPadding = 8
         return UIContentUnavailableView(configuration: configuration)
     }()
     
-    // MARK: - BitcoinCurrentRateStack
+    // MARK: - BitcoinCurrentRateHorizontalStack
     
     lazy private var bitcoinCurrentRateHorizontalStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .horizontal
-        stack.spacing = 6
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 6
         
         let icon = UIImage(systemName: "bitcoinsign.circle.fill", withConfiguration: UIImage.SymbolConfiguration(paletteColors: [.white, .orange]).applying(UIImage.SymbolConfiguration(scale: .large)))
         
-        stack.addArrangedSubview(UIImageView(image: icon))
-        stack.addArrangedSubview(bitcoinCurrentRateLabel)
+        stackView.addArrangedSubview(UIImageView(image: icon))
+        stackView.addArrangedSubview(bitcoinCurrentRateLabel)
         
-        return stack
+        return stackView
     }()
     
     // MARK: - BitcoinCurrentRateLabel
@@ -74,7 +75,7 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
-
+        
         // Sets label text if rate is more than zero.
         if getBitcoinData().rate > .zero, let formattedRate = NumberFormatter.bitcoinAmount(maximumFractionDigits: 2).string(from: NSNumber(value: getBitcoinData().rate)) {
             label.text = "\(formattedRate) USD"
@@ -83,10 +84,10 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         return label
     }()
     
-    // MARK: - ReplenishAlert
+    // MARK: - ReplenishAlertController
     
-    lazy private var replenishAlert: UIAlertController = {
-        let alert = UIAlertController(title: "Replenish", message: "Enter the amount of bitcoins you would like to deposit.", preferredStyle: .alert)
+    lazy private var replenishAlertController: UIAlertController = {
+        let alert = UIAlertController(title: "Replenish", message: "Specify bitcoin quantity you wish to deposit.", preferredStyle: .alert)
         alert.addTextField { textField in
             textField.placeholder = "Enter amount in BTC"
             textField.keyboardType = .decimalPad
@@ -108,7 +109,19 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         
         return alert
     }()
-        
+    
+    // MARK: - ErrorAlertController
+    
+    lazy private var errorAlertController: UIAlertController = {
+        let alert = UIAlertController(title: "Error", message: "Something went wrong, please try again later.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        return alert
+    }()
+}
+
+// MARK: - ViewControllerLifeCircle
+
+extension MainViewController {
     
     // MARK: - ViewDidLoad
     
@@ -130,81 +143,11 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
             }
         }
     }
-    
-    // MARK: - Setup
-    
-    /// Setups view and navigation bar appearance.
-    private func setup() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateHorizontalStack)
-        view.backgroundColor = .systemBackground
-        view.addSubview(tableView)
-        
-        balanceView.frame.size.width = view.frame.width
-        
-        if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: getBitcoinData().balance)) {
-            balanceView.bitcoinAmountLabel.text = "\(formattedAmount) BTC"
-        }
-        
-        balanceView.replenishBitcoinsButton.addTarget(self, action: #selector(showReplenishAlert), for: .touchUpInside)
-        balanceView.addTransactionButton.addTarget(self, action: #selector(showAddTransactionViewController), for: .touchUpInside)
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.showsVerticalScrollIndicator = false
-        tableView.tableHeaderView = balanceView
-        
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithDefaultBackground()
-        navigationItem.standardAppearance = appearance
-        navigationItem.scrollEdgeAppearance = appearance
-        navigationItem.compactAppearance = appearance
-    }
-    
-    // MARK: - ShowReplenishAlert
-    
-    @objc private func showReplenishAlert() {
-        if let textFields = replenishAlert.textFields, let first = textFields.first, let index = replenishAlert.actions.firstIndex(where: { $0.title == "Done" }) {
-            first.text = .empty
-            replenishAlert.actions[index].isEnabled = false
-        }
-        
-        present(replenishAlert, animated: true)
-    }
-    
-    // MARK: - ShowAddTransactionViewController
-    
-    @objc private func showAddTransactionViewController() {
-        let addTransactionViewController = AddTransactionViewController()
-        addTransactionViewController.delegate = self
-        navigationController?.pushViewController(addTransactionViewController, animated: true)
-    }
-    
-    // MARK: - AlertTextFieldDidChange
-    
-    @objc private func alertTextFieldDidChange(_ sender: UITextField) {
-        var isEnabled = false
-        
-        if let text = sender.text {
-            sender.text = text.replacingOccurrences(of: ",", with: ".")
-            let amount = Double(text)
-            isEnabled = !(amount == nil || amount == .zero)
-        }
-        
-        if let index = replenishAlert.actions.firstIndex(where: { $0.title == "Done" }) {
-            replenishAlert.actions[index].isEnabled = isEnabled
-        }
-    }
-    
-    // MARK: - Constraints
-    
-    private func constraints() {
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
+}
+
+// MARK: - BitcoinRate
+
+extension MainViewController {
     
     // MARK: - IsPriceShouldBeUpdated
     
@@ -236,36 +179,120 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
             let rate = response.price.dollar.rate
             
             // Saves rate and last updated time received from response.
-            save(rate, DateFormatter.full.date(from: response.time.updated))
+            updateBitcoinCurrentPrice(rate, DateFormatter.full.date(from: response.time.updated))
             
             if let formattedRate = NumberFormatter.bitcoinAmount(maximumFractionDigits: 2).string(from: NSNumber(value: getBitcoinData().rate)) {
                 bitcoinCurrentRateLabel.text = "\(formattedRate) USD"
             }
         } catch {
             // Resets saved rate and last updated time in storage.
-            save()
+            updateBitcoinCurrentPrice()
             bitcoinCurrentRateLabel.text = "Failure"
         }
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateHorizontalStack)
     }
     
-    // MARK: - Save
+    // MARK: - UpdateBitcoinCurrentPrice
     
     /// Saves Bitcoin rate and last update time to storage.
-    private func save(_ rate: Double = .zero, _ updated: Date? = nil) {
+    private func updateBitcoinCurrentPrice(_ rate: Double = .zero, _ updated: Date? = nil) {
         getBitcoinData().rate = rate
         getBitcoinData().lastUpdate = updated
         
-        do {
-            try context.save()
-        } catch {
-            print(error.localizedDescription)
+        StorageService.shared.saveContext { error in
+            errorAlertController.message = error.localizedDescription
+            present(errorAlertController, animated: true)
         }
     }
 }
 
-// MARK: - Table
+// MARK: - Layout
+
+extension MainViewController {
+    
+    // MARK: - Setup
+    
+    /// Setups view and navigation bar appearance.
+    private func setup() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateHorizontalStack)
+        view.backgroundColor = .systemBackground
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        navigationItem.standardAppearance = appearance
+        navigationItem.scrollEdgeAppearance = appearance
+        navigationItem.compactAppearance = appearance
+        
+        balanceView.frame.size.width = view.frame.width
+        
+        if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: getBitcoinData().balance)) {
+            balanceView.bitcoinAmountLabel.text = "\(formattedAmount) BTC"
+        }
+        
+        balanceView.replenishBitcoinsButton.addTarget(self, action: #selector(showReplenishAlert), for: .touchUpInside)
+        balanceView.addTransactionButton.addTarget(self, action: #selector(showAddTransactionViewController), for: .touchUpInside)
+        
+        view.addSubview(transactionTableView)
+        transactionTableView.delegate = self
+        transactionTableView.dataSource = self
+        transactionTableView.showsVerticalScrollIndicator = false
+        transactionTableView.tableHeaderView = balanceView
+    }
+    
+    // MARK: - Constraints
+    
+    private func constraints() {
+        NSLayoutConstraint.activate([
+            transactionTableView.topAnchor.constraint(equalTo: view.topAnchor),
+            transactionTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            transactionTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            transactionTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+}
+
+// MARK: - Actions
+
+extension MainViewController {
+    
+    // MARK: - ShowReplenishAlert
+    
+    @objc private func showReplenishAlert() {
+        if let textFields = replenishAlertController.textFields, let first = textFields.first, let index = replenishAlertController.actions.firstIndex(where: { $0.title == "Done" }) {
+            first.text = .empty
+            replenishAlertController.actions[index].isEnabled = false
+        }
+        
+        present(replenishAlertController, animated: true)
+    }
+    
+    // MARK: - ShowAddTransactionViewController
+    
+    @objc private func showAddTransactionViewController() {
+        let addTransactionViewController = AddTransactionViewController()
+        addTransactionViewController.delegate = self
+        navigationController?.pushViewController(addTransactionViewController, animated: true)
+    }
+    
+    // MARK: - AlertTextFieldDidChange
+    
+    @objc private func alertTextFieldDidChange(_ sender: UITextField) {
+        var isEnabled = false
+        
+        if let text = sender.text {
+            sender.text = text.replacingOccurrences(of: ",", with: ".")
+            let amount = Double(text)
+            isEnabled = !(amount == nil || amount == .zero)
+        }
+        
+        if let index = replenishAlertController.actions.firstIndex(where: { $0.title == "Done" }) {
+            replenishAlertController.actions[index].isEnabled = isEnabled
+        }
+    }
+}
+
+// MARK: - UITableViewDelegate, UITableViewDataSource
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -323,9 +350,32 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-// MARK: - Transactions
+// MARK: - Storage
 
 extension MainViewController {
+    
+    // MARK: - Add
+    
+    func addTransaction(amount: Double, type: TransactionType, category: ExpenseCategory?) {
+        let new = Transaction(context: context)
+        new.type = type
+        new.amount = amount
+        new.category = category?.rawValue
+        new.date = .now
+        
+        getBitcoinData().balance += amount
+        
+        if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: getBitcoinData().balance)) {
+            balanceView.bitcoinAmountLabel.text = "\(formattedAmount) BTC"
+        }
+        
+        StorageService.shared.saveContext { error in
+            errorAlertController.message = error.localizedDescription
+            present(errorAlertController, animated: true)
+        } success: {
+            fetchTransactions(limit: rows.count + 1) // Updates rows in table view without pagination, but with a limit of one more than the current number of transactions, for the newly created.
+        }
+    }
     
     // MARK: - Fetch
     
@@ -340,8 +390,8 @@ extension MainViewController {
             
             if transactions.isEmpty {
                 isAllTransactionReceived = true
-                tableView.backgroundView = sections.isEmpty ? contentUnavailableView : nil
-                tableView.isScrollEnabled = !sections.isEmpty
+                transactionTableView.backgroundView = sections.isEmpty ? contentUnavailableEmptyView : nil
+                transactionTableView.isScrollEnabled = !sections.isEmpty
                 return // No need to update sections or reload data.
             }
             
@@ -354,12 +404,17 @@ extension MainViewController {
                 guard let first = $0.date, let second = $1.date else { return false }
                 return first > second
             }
-
-            sections.sort(by: { $0.headline > $1.headline })
             
-            tableView.reloadData()
+            sections.sort(by: { $0.headline > $1.headline })
+            transactionTableView.backgroundView = sections.isEmpty ? contentUnavailableEmptyView : nil
+            transactionTableView.isScrollEnabled = !sections.isEmpty
+            
+            DispatchQueue.main.async {
+                self.transactionTableView.reloadData()
+            }
         } catch {
-            print(error.localizedDescription)
+            errorAlertController.message = error.localizedDescription
+            present(errorAlertController, animated: true)
         }
     }
     
@@ -369,37 +424,15 @@ extension MainViewController {
         do {
             let transactions = try context.fetch(Bitcoin.fetchRequest())
             if let first = transactions.first {
-                return first
+                return first // Uses always only one instance if it already exists.
             }
         } catch {
-            print(error.localizedDescription)
+            errorAlertController.message = error.localizedDescription
+            present(errorAlertController, animated: true)
         }
         
-        let bitcoin = Bitcoin(context: context)
+        let bitcoin = Bitcoin(context: context) // Or create a new one.
         bitcoin.balance = .zero
         return bitcoin
-    }
-    
-    // MARK: - Add
-    
-    func addTransaction(amount: Double, type: TransactionType, category: ExpenseCategory?) {
-        let new = Transaction(context: context)
-        new.type = type
-        new.amount = amount
-        new.category = category?.rawValue
-        new.date = Date.now
-        
-        getBitcoinData().balance += amount
-        
-        if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: getBitcoinData().balance)) {
-            balanceView.bitcoinAmountLabel.text = "\(formattedAmount) BTC"
-        }
-        
-        do {
-            try context.save()
-            fetchTransactions(limit: rows.count + 1) // Updates rows in table view without pagination, but with a limit of one more than the current number of transactions, for the newly created.
-        } catch {
-            print(error.localizedDescription)
-        }
     }
 }

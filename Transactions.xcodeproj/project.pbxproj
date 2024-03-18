@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		F44F6ED92BA8B05F0061050E /* TransactionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44F6ED82BA8B05F0061050E /* TransactionType.swift */; };
+		F44F6EDB2BA8C8110061050E /* AddTransactionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44F6EDA2BA8C8110061050E /* AddTransactionDelegate.swift */; };
+		F44F6EDD2BA8C9940061050E /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44F6EDC2BA8C9940061050E /* StorageService.swift */; };
 		F48431C52BA8499500D2CCD4 /* Bitcoin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48431C32BA8499500D2CCD4 /* Bitcoin.swift */; };
 		F4BFAFFF2BA5B684008F7ACE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */; };
 		F4BFB0012BA5B684008F7ACE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */; };
@@ -29,6 +31,8 @@
 
 /* Begin PBXFileReference section */
 		F44F6ED82BA8B05F0061050E /* TransactionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionType.swift; sourceTree = "<group>"; };
+		F44F6EDA2BA8C8110061050E /* AddTransactionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionDelegate.swift; sourceTree = "<group>"; };
+		F44F6EDC2BA8C9940061050E /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		F48431C32BA8499500D2CCD4 /* Bitcoin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bitcoin.swift; sourceTree = "<group>"; };
 		F4BFAFFB2BA5B684008F7ACE /* Transactions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transactions.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -127,6 +131,7 @@
 			children = (
 				F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */,
 				F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */,
+				F44F6EDA2BA8C8110061050E /* AddTransactionDelegate.swift */,
 			);
 			path = Delegates;
 			sourceTree = "<group>";
@@ -153,6 +158,7 @@
 			children = (
 				F48431C32BA8499500D2CCD4 /* Bitcoin.swift */,
 				F4BFB0282BA6105B008F7ACE /* Transaction.swift */,
+				F44F6EDC2BA8C9940061050E /* StorageService.swift */,
 				F4BFB0252BA60D43008F7ACE /* Transactions.xcdatamodeld */,
 			);
 			path = Storage;
@@ -242,7 +248,9 @@
 				F4BFB0502BA6126C008F7ACE /* ExpenseCategory.swift in Sources */,
 				F4BFB0532BA62639008F7ACE /* BalanceView.swift in Sources */,
 				F4BFB01B2BA5F344008F7ACE /* Extensions.swift in Sources */,
+				F44F6EDB2BA8C8110061050E /* AddTransactionDelegate.swift in Sources */,
 				F4BFB0272BA60D43008F7ACE /* Transactions.xcdatamodeld in Sources */,
+				F44F6EDD2BA8C9940061050E /* StorageService.swift in Sources */,
 				F4BFB0592BA76D47008F7ACE /* AddTransactionViewController.swift in Sources */,
 				F4BFAFFF2BA5B684008F7ACE /* AppDelegate.swift in Sources */,
 				F44F6ED92BA8B05F0061050E /* TransactionType.swift in Sources */,

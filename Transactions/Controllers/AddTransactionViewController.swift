@@ -7,14 +7,13 @@
 
 import UIKit
 
-/// Transfers data to create a new transaction between controllers.
-protocol AddTransactionDelegate: AnyObject {
-    func addTransaction(amount: Double, type: TransactionType, category: ExpenseCategory?)
-}
-
 final class AddTransactionViewController: UIViewController {
     
-    // MARK: - Field
+    // MARK: - Properties
+    
+    weak var delegate: AddTransactionDelegate?
+    
+    // MARK: - AmountField
     
     let amountField: UITextField = {
         let textField = UITextField()
@@ -28,7 +27,7 @@ final class AddTransactionViewController: UIViewController {
         return textField
     }()
     
-    // MARK: - Category
+    // MARK: - CategoryButton
     
     private let categoryButton: UIButton = {
         var configuration = UIButton.Configuration.tinted()
@@ -41,10 +40,10 @@ final class AddTransactionViewController: UIViewController {
         return button
     }()
     
-    // MARK: - Actions
+    // MARK: - ExpenseCategoryMenuChildren
     
     /// Displays a menu options with the ability to select a category.
-    var actions: [UIAction] {
+    var expenseCategoryMenuChildren: [UIAction] {
         return ExpenseCategory.allCases.map { category in
             let title = category.rawValue.capitalized
             
@@ -56,10 +55,10 @@ final class AddTransactionViewController: UIViewController {
         }
     }
     
-    // MARK: - Menu
+    // MARK: - ExpenseCategoryMenu
     
-    var menu: UIMenu {
-        UIMenu(title: "Choose transaction category.", image: nil, identifier: nil, options: [], children: actions)
+    var expenseCategoryMenu: UIMenu {
+        UIMenu(title: "Choose transaction category.", image: nil, identifier: nil, options: [], children: expenseCategoryMenuChildren)
     }
     
     // MARK: - Toolbar
@@ -81,14 +80,7 @@ final class AddTransactionViewController: UIViewController {
         return toolbar
     }()
     
-    // MARK: - Done
-    
-    /// End editing of amount field.
-    @objc func done(sender: UIBarButtonItem) {
-        amountField.resignFirstResponder()
-    }
-    
-    // MARK: - Add
+    // MARK: - AddButton
     
     let addButton: UIButton = {
         var configuration = UIButton.Configuration.filled()
@@ -106,8 +98,11 @@ final class AddTransactionViewController: UIViewController {
         
         return button
     }()
-    
-    weak var delegate: AddTransactionDelegate?
+}
+
+// MARK: - ViewControllerLifeCircle
+
+extension AddTransactionViewController {
     
     // MARK: - ViewDidLoad
     
@@ -116,6 +111,20 @@ final class AddTransactionViewController: UIViewController {
         setup()
         constraints()
     }
+}
+
+// MARK: - Actions
+
+extension AddTransactionViewController {
+    
+    // MARK: - Done
+    
+    /// End editing of amount field.
+    @objc func done(sender: UIBarButtonItem) {
+        amountField.resignFirstResponder()
+    }
+    
+    // MARK: - Amount
     
     /// Returns the amount of bitcoins entered by the user in the text field or nil if the number is incorrect.
     private func amount() -> Double? {
@@ -123,24 +132,32 @@ final class AddTransactionViewController: UIViewController {
         return amount
     }
     
+    // MARK: - Category
+    
     /// Returns the category selected by the user, or nothing if the user did not select one.
     private func category() -> ExpenseCategory? {
         guard let text = categoryButton.configuration?.title, let category = ExpenseCategory(rawValue: text.lowercased()) else { return nil }
         return category
     }
     
+    // MARK: - ValidateAmountField
+    
     /// Changes the appearance of the text field if the entered amount is not valid.
     private func validateAmountField() {
         amountField.layer.borderColor = amount() == nil || amount() == .zero ? UIColor.red.cgColor : UIColor.clear.cgColor
     }
-
+    
+    // MARK: - ValidateCategoryButton
+    
     /// Changes the appearance of the button if the user has not selected a category.
     private func validateCategoryButton() {
         categoryButton.tintColor = category() != nil ? .accent : .red
     }
     
+    // MARK: - Add
+    
     /// Adds a new transaction to storage if all data is entered correctly.
-    private func add() {
+    @objc private func add() {
         validateAmountField()
         validateCategoryButton()
         
@@ -149,6 +166,11 @@ final class AddTransactionViewController: UIViewController {
             navigationController?.popViewController(animated: true)
         }
     }
+}
+
+// MARK: - Layout
+
+extension AddTransactionViewController {
     
     // MARK: - Setup
     
@@ -169,14 +191,10 @@ final class AddTransactionViewController: UIViewController {
         amountField.delegate = self
         amountField.inputAccessoryView = toolbar
         
-        categoryButton.menu = menu
+        categoryButton.menu = expenseCategoryMenu
         categoryButton.showsMenuAsPrimaryAction = true
         
-        addButton.addAction(
-            UIAction { [weak self] _ in
-                self?.add()
-            }, for: .touchUpInside
-        )
+        addButton.addTarget(self, action: #selector(add), for: .touchUpInside)
     }
     
     // MARK: - Constraints
