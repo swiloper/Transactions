@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F48431C52BA8499500D2CCD4 /* Bitcoin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48431C32BA8499500D2CCD4 /* Bitcoin.swift */; };
 		F4BFAFFF2BA5B684008F7ACE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */; };
 		F4BFB0012BA5B684008F7ACE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */; };
 		F4BFB0032BA5B684008F7ACE /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BFB0022BA5B684008F7ACE /* MainViewController.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F48431C32BA8499500D2CCD4 /* Bitcoin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bitcoin.swift; sourceTree = "<group>"; };
 		F4BFAFFB2BA5B684008F7ACE /* Transactions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transactions.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BFAFFE2BA5B684008F7ACE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F4BFB0002BA5B684008F7ACE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 		F4BFB0242BA60D1E008F7ACE /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				F48431C32BA8499500D2CCD4 /* Bitcoin.swift */,
 				F4BFB0282BA6105B008F7ACE /* Transaction.swift */,
 				F4BFB0252BA60D43008F7ACE /* Transactions.xcdatamodeld */,
 			);
@@ -231,6 +234,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F48431C52BA8499500D2CCD4 /* Bitcoin.swift in Sources */,
 				F4BFB0032BA5B684008F7ACE /* MainViewController.swift in Sources */,
 				F4BFB0502BA6126C008F7ACE /* Category.swift in Sources */,
 				F4BFB0532BA62639008F7ACE /* BalanceView.swift in Sources */,
@@ -392,9 +396,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Transactions/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -419,9 +422,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Transactions/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

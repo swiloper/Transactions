@@ -20,9 +20,15 @@ extension Date {
     }
 }
 
-extension UserDefaults {
-    enum Keys: String {
-        case bitcoinRate, lastPriceUpdate
+extension NumberFormatter {
+    static func bitcoinAmount(maximumFractionDigits: Int = 8) -> NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = .zero
+        formatter.maximumFractionDigits = maximumFractionDigits
+        formatter.decimalSeparator = "."
+        formatter.groupingSeparator = ","
+        return formatter
     }
 }
 

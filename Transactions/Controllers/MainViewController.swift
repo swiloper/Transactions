@@ -37,16 +37,31 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         return UIContentUnavailableView(configuration: configuration)
     }()
     
+    // MARK: - BitcoinCurrentRateStack
+    
+    lazy private var bitcoinCurrentRateHorizontalStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 6
+        
+        let icon = UIImage(systemName: "bitcoinsign.circle.fill", withConfiguration: UIImage.SymbolConfiguration(paletteColors: [.white, .orange]).applying(UIImage.SymbolConfiguration(scale: .large)))
+        
+        stack.addArrangedSubview(UIImageView(image: icon))
+        stack.addArrangedSubview(bitcoinCurrentRateLabel)
+        
+        return stack
+    }()
+    
     // MARK: - BitcoinCurrentRateLabel
     
-    private let bitcoinCurrentRateLabel: UILabel = {
+    lazy private var bitcoinCurrentRateLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
 
-        // Sets label text if rate is available in user defaults.
-        if let rate = UserDefaults.standard.string(forKey: UserDefaults.Keys.bitcoinRate.rawValue) {
-            label.text = "BTCUSD " + rate
+        // Sets label text if rate is more than zero.
+        if getBitcoinData().rate > .zero, let formattedRate = NumberFormatter.bitcoinAmount(maximumFractionDigits: 2).string(from: NSNumber(value: getBitcoinData().rate)) {
+            label.text = "\(formattedRate) USD"
         }
         
         return label
@@ -104,11 +119,16 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
     
     /// Setups view and navigation bar appearance.
     private func setup() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateLabel)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateHorizontalStack)
         view.backgroundColor = .systemBackground
         view.addSubview(tableView)
         
         balanceView.frame.size.width = view.frame.width
+        
+        if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: getBitcoinData().balance)) {
+            balanceView.bitcoinAmountLabel.text = "\(formattedAmount) BTC"
+        }
+        
         balanceView.replenishBitcoinsButton.addTarget(self, action: #selector(showReplenishAlert), for: .touchUpInside)
         balanceView.addTransactionButton.addTarget(self, action: #selector(showAddTransactionViewController), for: .touchUpInside)
         
@@ -173,11 +193,11 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
     
     /// Checks if Bitcoin price needs to be updated based on last update time.
     private func isPriceShouldBeUpdated() -> Bool {
-        if let updated = UserDefaults.standard.string(forKey: UserDefaults.Keys.lastPriceUpdate.rawValue), let date = DateFormatter.full.date(from: updated) {
+        if let date = getBitcoinData().lastUpdate {
             let calendar = Calendar.current
             let components = calendar.dateComponents([.hour], from: date, to: Date.now)
             
-            // Allows updating the Bitcoin price only if the last rate update time value is present in user defaults and the difference between it and the current time is more than one hour.
+            // Allows updating the Bitcoin price only if the last rate update time value is present in storage and the difference between it and the current time is more than one hour.
             if let hours = components.hour {
                 return hours > 1
             }
@@ -199,23 +219,32 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
             let rate = response.price.dollar.rate
             
             // Saves rate and last updated time received from response.
-            save(rate, response.time.updated)
-            bitcoinCurrentRateLabel.text = "BTCUSD " + rate
+            save(rate, DateFormatter.full.date(from: response.time.updated))
+            
+            if let formattedRate = NumberFormatter.bitcoinAmount(maximumFractionDigits: 2).string(from: NSNumber(value: getBitcoinData().rate)) {
+                bitcoinCurrentRateLabel.text = "\(formattedRate) USD"
+            }
         } catch {
-            // Resets saved rate and last updated time in user defaults.
+            // Resets saved rate and last updated time in storage.
             save()
             bitcoinCurrentRateLabel.text = "Failure"
         }
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateLabel)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: bitcoinCurrentRateHorizontalStack)
     }
     
     // MARK: - Save
     
-    /// Saves Bitcoin rate and last update time to user defaults.
-    private func save(_ rate: String? = nil, _ updated: String? = nil) {
-        UserDefaults.standard.set(rate, forKey: UserDefaults.Keys.bitcoinRate.rawValue)
-        UserDefaults.standard.set(updated, forKey: UserDefaults.Keys.lastPriceUpdate.rawValue)
+    /// Saves Bitcoin rate and last update time to storage.
+    private func save(_ rate: Double = .zero, _ updated: Date? = nil) {
+        getBitcoinData().rate = rate
+        getBitcoinData().lastUpdate = updated
+        
+        do {
+            try context.save()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }
 
@@ -251,7 +280,10 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             configuration.secondaryText = "\(value.capitalized) · \(DateFormatter.time.string(from: date))"
         }
         
-        configuration.text = "\(transaction.amount) BTC"
+        if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: transaction.amount)) {
+            configuration.text = formattedAmount
+        }
+        
         configuration.textProperties.color = transaction.amount > .zero ? .systemGreen : .label
         configuration.textToSecondaryTextVerticalPadding = 2
         configuration.secondaryTextProperties.color = .gray
@@ -293,14 +325,36 @@ extension MainViewController {
         }
     }
     
+    // MARK: - GetBitcoinData
+    
+    private func getBitcoinData() -> Bitcoin {
+        do {
+            let transactions = try context.fetch(Bitcoin.fetchRequest())
+            if let first = transactions.first {
+                return first
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        let bitcoin = Bitcoin(context: context)
+        bitcoin.balance = .zero
+        return bitcoin
+    }
+    
     // MARK: - Add
     
     func addTransaction(amount: Double, category: Category) {
         let new = Transaction(context: context)
-        new.id = UUID().uuidString
         new.amount = amount
         new.category = category.rawValue
         new.date = Date.now
+        
+        getBitcoinData().balance += amount
+        
+        if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: getBitcoinData().balance)) {
+            balanceView.bitcoinAmountLabel.text = "\(formattedAmount) BTC"
+        }
         
         do {
             try context.save()

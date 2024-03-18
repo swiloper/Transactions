@@ -23,7 +23,6 @@ extension Transaction {
     @NSManaged public var date: Date?
     @NSManaged public var amount: Double
     @NSManaged public var category: String?
-    @NSManaged public var id: String?
 
 }
 

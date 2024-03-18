@@ -30,5 +30,9 @@ struct Price: Decodable {
 }
 
 struct Currency: Decodable {
-    let rate: String
+    let rate: Double
+    
+    enum CodingKeys: String, CodingKey {
+        case rate = "rate_float"
+    }
 }

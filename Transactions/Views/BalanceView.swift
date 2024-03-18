@@ -24,9 +24,8 @@ final class BalanceView: UIView {
         return label
     }()
     
-    private let bitcoinAmountLabel: UILabel = {
+    let bitcoinAmountLabel: UILabel = {
         let label = UILabel()
-        label.text = "0.000461 BTC"
         label.font = .systemFont(ofSize: 24, weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
