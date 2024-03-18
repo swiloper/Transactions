@@ -97,7 +97,7 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         alert.addAction(
             UIAlertAction(title: "Done", style: .default) { [weak self] _ in
                 if let textFields = alert.textFields, let first = textFields.first, let text = first.text, let amount = Double(text) {
-                    self?.addTransaction(amount: amount, category: .income)
+                    self?.addTransaction(amount: amount, type: .income, category: nil)
                 }
             }
         )
@@ -291,10 +291,15 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         
         var configuration = cell.defaultContentConfiguration()
         
-        if let value = transaction.category, let category = Category(rawValue: value), let date = transaction.date, let image = category.icon {
-            configuration.image = image
-            configuration.imageProperties.tintColor = category.color
-            configuration.secondaryText = "\(value.capitalized) · \(DateFormatter.time.string(from: date))"
+        if let date = transaction.date {
+            if transaction.type == .income, let image = transaction.type.icon {
+                configuration.image = image
+                configuration.secondaryText = "\(transaction.type.title) · \(DateFormatter.time.string(from: date))"
+            } else if let value = transaction.category, let category = ExpenseCategory(rawValue: value), let image = category.icon {
+                configuration.image = image
+                configuration.imageProperties.tintColor = category.color
+                configuration.secondaryText = "\(value.capitalized) · \(DateFormatter.time.string(from: date))"
+            }
         }
         
         if let formattedAmount = NumberFormatter.bitcoinAmount().string(from: NSNumber(value: transaction.amount)) {
@@ -377,10 +382,11 @@ extension MainViewController {
     
     // MARK: - Add
     
-    func addTransaction(amount: Double, category: Category) {
+    func addTransaction(amount: Double, type: TransactionType, category: ExpenseCategory?) {
         let new = Transaction(context: context)
+        new.type = type
         new.amount = amount
-        new.category = category.rawValue
+        new.category = category?.rawValue
         new.date = Date.now
         
         getBitcoinData().balance += amount

@@ -9,7 +9,7 @@ import UIKit
 
 /// Transfers data to create a new transaction between controllers.
 protocol AddTransactionDelegate: AnyObject {
-    func addTransaction(amount: Double, category: Category)
+    func addTransaction(amount: Double, type: TransactionType, category: ExpenseCategory?)
 }
 
 final class AddTransactionViewController: UIViewController {
@@ -45,7 +45,7 @@ final class AddTransactionViewController: UIViewController {
     
     /// Displays a menu options with the ability to select a category.
     var actions: [UIAction] {
-        return Category.allCases.filter({ $0 != .income }).map { category in
+        return ExpenseCategory.allCases.map { category in
             let title = category.rawValue.capitalized
             
             return UIAction(title: title, image: category.icon) { [weak self] _ in
@@ -124,8 +124,8 @@ final class AddTransactionViewController: UIViewController {
     }
     
     /// Returns the category selected by the user, or nothing if the user did not select one.
-    private func category() -> Category? {
-        guard let text = categoryButton.configuration?.title, let category = Category(rawValue: text.lowercased()) else { return nil }
+    private func category() -> ExpenseCategory? {
+        guard let text = categoryButton.configuration?.title, let category = ExpenseCategory(rawValue: text.lowercased()) else { return nil }
         return category
     }
     
@@ -145,7 +145,7 @@ final class AddTransactionViewController: UIViewController {
         validateCategoryButton()
         
         if let amount = amount(), let category = category() {
-            delegate?.addTransaction(amount: -amount, category: category)
+            delegate?.addTransaction(amount: -amount, type: .expense, category: category)
             navigationController?.popViewController(animated: true)
         }
     }

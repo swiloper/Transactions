@@ -1,5 +1,5 @@
 //
-//  Category.swift
+//  ExpenseCategory.swift
 //  Transactions
 //
 //  Created by Ihor Myronishyn on 16.03.2024.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-enum Category: String, CaseIterable {
-    case groceries, taxi, electronics, restaurant, other, income
+enum ExpenseCategory: String, CaseIterable {
+    case groceries, taxi, electronics, restaurant, other
     
     /// Category system icon.
     var icon: UIImage? {
@@ -23,8 +23,6 @@ enum Category: String, CaseIterable {
             UIImage(systemName: "fork.knife")
         case .other:
             UIImage(systemName: "shippingbox.fill")
-        case .income:
-            UIImage(systemName: "arrow.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(paletteColors: [.white, color]))
         }
     }
     
@@ -41,8 +39,6 @@ enum Category: String, CaseIterable {
             .systemBlue
         case .other:
             .systemBrown
-        case .income:
-            .darkGray
         }
     }
 }
