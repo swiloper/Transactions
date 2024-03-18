@@ -8,21 +8,23 @@
 import UIKit
 
 enum Category: String, CaseIterable {
-    case groceries, taxi, electronics, restaurant, other
+    case groceries, taxi, electronics, restaurant, other, income
     
-    /// Name of the category system icon.
-    var icon: String {
+    /// Category system icon.
+    var icon: UIImage? {
         switch self {
         case .groceries:
-            "basket.fill"
+            UIImage(systemName: "basket.fill")
         case .taxi:
-            "car.rear.fill"
+            UIImage(systemName: "car.rear.fill")
         case .electronics:
-            "macbook.and.ipad"
+            UIImage(systemName: "macbook.and.ipad")
         case .restaurant:
-            "fork.knife"
+            UIImage(systemName: "fork.knife")
         case .other:
-            "shippingbox.fill"
+            UIImage(systemName: "shippingbox.fill")
+        case .income:
+            UIImage(systemName: "arrow.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(paletteColors: [.white, color]))
         }
     }
     
@@ -39,6 +41,8 @@ enum Category: String, CaseIterable {
             .systemBlue
         case .other:
             .systemBrown
+        case .income:
+            .darkGray
         }
     }
 }

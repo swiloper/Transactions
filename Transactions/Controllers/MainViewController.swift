@@ -12,7 +12,6 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
     // MARK: - Properties
     
     private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     private var sections = [GroupedSection<Date, Transaction>]()
     
     // MARK: - BalanceView
@@ -53,6 +52,33 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         return label
     }()
     
+    // MARK: - ReplenishAlert
+    
+    lazy private var replenishAlert: UIAlertController = {
+        let alert = UIAlertController(title: "Replenish", message: "Enter the amount of bitcoins you would like to deposit.", preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.placeholder = "Enter amount in BTC"
+            textField.keyboardType = .decimalPad
+            textField.addTarget(self, action: #selector(self.alertTextFieldDidChange(_:)), for: .editingChanged)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(
+            UIAlertAction(title: "Done", style: .default) { [weak self] _ in
+                if let textFields = alert.textFields, let first = textFields.first, let text = first.text, let amount = Double(text) {
+                    self?.addTransaction(amount: amount, category: .income)
+                }
+            }
+        )
+        
+        if let index = alert.actions.firstIndex(where: { $0.title == "Done" }) {
+            alert.actions[index].isEnabled = false
+        }
+        
+        return alert
+    }()
+        
+    
     // MARK: - ViewDidLoad
     
     override func viewDidLoad() {
@@ -83,23 +109,53 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         view.addSubview(tableView)
         
         balanceView.frame.size.width = view.frame.width
-        balanceView.addTransactionButton.addAction(
-            UIAction { _ in
-                let addTransactionViewController = AddTransactionViewController()
-                addTransactionViewController.delegate = self
-                self.navigationController?.pushViewController(addTransactionViewController, animated: true)
-            }, for: .touchUpInside
-        )
+        balanceView.replenishBitcoinsButton.addTarget(self, action: #selector(showReplenishAlert), for: .touchUpInside)
+        balanceView.addTransactionButton.addTarget(self, action: #selector(showAddTransactionViewController), for: .touchUpInside)
         
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = balanceView
         
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
+        appearance.configureWithDefaultBackground()
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
         navigationItem.compactAppearance = appearance
+    }
+    
+    // MARK: - ShowReplenishAlert
+    
+    @objc private func showReplenishAlert() {
+        if let textFields = replenishAlert.textFields, let first = textFields.first, let index = replenishAlert.actions.firstIndex(where: { $0.title == "Done" }) {
+            first.text = .empty
+            replenishAlert.actions[index].isEnabled = false
+        }
+        
+        present(replenishAlert, animated: true)
+    }
+    
+    // MARK: - ShowAddTransactionViewController
+    
+    @objc private func showAddTransactionViewController() {
+        let addTransactionViewController = AddTransactionViewController()
+        addTransactionViewController.delegate = self
+        navigationController?.pushViewController(addTransactionViewController, animated: true)
+    }
+    
+    // MARK: - AlertTextFieldDidChange
+    
+    @objc private func alertTextFieldDidChange(_ sender: UITextField) {
+        var isEnabled = false
+        
+        if let text = sender.text {
+            sender.text = text.replacingOccurrences(of: ",", with: ".")
+            let amount = Double(text)
+            isEnabled = !(amount == nil || amount == .zero)
+        }
+        
+        if let index = replenishAlert.actions.firstIndex(where: { $0.title == "Done" }) {
+            replenishAlert.actions[index].isEnabled = isEnabled
+        }
     }
     
     // MARK: - Constraints
@@ -185,16 +241,18 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let transaction = sections[indexPath.section].rows[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.selectionStyle = .none
         
         var configuration = cell.defaultContentConfiguration()
         
-        if let value = transaction.category, let category = Category(rawValue: value), let date = transaction.date {
-            configuration.image = UIImage(systemName: category.icon)
+        if let value = transaction.category, let category = Category(rawValue: value), let date = transaction.date, let image = category.icon {
+            configuration.image = image
             configuration.imageProperties.tintColor = category.color
             configuration.secondaryText = "\(value.capitalized) · \(DateFormatter.time.string(from: date))"
         }
         
         configuration.text = "\(transaction.amount) BTC"
+        configuration.textProperties.color = transaction.amount > .zero ? .systemGreen : .label
         configuration.textToSecondaryTextVerticalPadding = 2
         configuration.secondaryTextProperties.color = .gray
         

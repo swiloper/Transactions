@@ -36,7 +36,7 @@ final class BalanceView: UIView {
         stack(axis: .horizontal, spacing: 12)
     }()
     
-    private let replenishBitcoinsButton: UIButton = {
+    let replenishBitcoinsButton: UIButton = {
         var configuration = UIButton.Configuration.filled()
         configuration.cornerStyle = .medium
         
@@ -104,7 +104,7 @@ final class BalanceView: UIView {
         dividerVerticalStack.addArrangedSubview(topSeparator)
         dividerVerticalStack.addArrangedSubview(balanceVerticalStackView)
         dividerVerticalStack.addArrangedSubview(bottomSeparator)
-        dividerVerticalStack.backgroundColor = .white
+        dividerVerticalStack.backgroundColor = .row
         
         addTransactionVerticalStack.addArrangedSubview(dividerVerticalStack)
         addTransactionVerticalStack.addArrangedSubview(addTransactionButton)

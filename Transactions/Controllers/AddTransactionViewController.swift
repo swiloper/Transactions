@@ -45,14 +45,13 @@ final class AddTransactionViewController: UIViewController {
     
     /// Displays a menu options with the ability to select a category.
     var actions: [UIAction] {
-        return Category.allCases.map { category in
+        return Category.allCases.filter({ $0 != .income }).map { category in
             let title = category.rawValue.capitalized
-            let image = UIImage(systemName: category.icon)
             
-            return UIAction(title: title, image: image) { _ in
-                self.categoryButton.configuration?.title = title
-                self.categoryButton.configuration?.image = image
-                self.categoryButton.tintColor = .accent
+            return UIAction(title: title, image: category.icon) { [weak self] _ in
+                self?.categoryButton.configuration?.title = title
+                self?.categoryButton.configuration?.image = category.icon
+                self?.categoryButton.tintColor = .accent
             }
         }
     }
@@ -69,7 +68,7 @@ final class AddTransactionViewController: UIViewController {
     lazy var toolbar: UIToolbar = {
         let toolbar = UIToolbar(frame: CGRect(origin: .zero, size: CGSize(width: view.frame.width, height: 35)))
         toolbar.barStyle = .default
-        toolbar.isTranslucent = false
+        toolbar.isTranslucent = true
         toolbar.tintColor = .accent
         toolbar.sizeToFit()
         
@@ -146,7 +145,7 @@ final class AddTransactionViewController: UIViewController {
         validateCategoryButton()
         
         if let amount = amount(), let category = category() {
-            delegate?.addTransaction(amount: amount, category: category)
+            delegate?.addTransaction(amount: -amount, category: category)
             navigationController?.popViewController(animated: true)
         }
     }
@@ -158,7 +157,7 @@ final class AddTransactionViewController: UIViewController {
         view.backgroundColor = .systemGray6
         
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
+        appearance.configureWithDefaultBackground()
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
         navigationItem.compactAppearance = appearance
@@ -174,8 +173,8 @@ final class AddTransactionViewController: UIViewController {
         categoryButton.showsMenuAsPrimaryAction = true
         
         addButton.addAction(
-            UIAction { _ in
-                self.add()
+            UIAction { [weak self] _ in
+                self?.add()
             }, for: .touchUpInside
         )
     }
