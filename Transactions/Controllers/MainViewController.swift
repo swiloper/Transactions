@@ -12,7 +12,23 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
     // MARK: - Properties
     
     private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    /// Specifies the number of transactions that should be fetched from the storage at a time.
+    private var paginationLimit: Int = 20
+    
+    /// Defines the place in the array of all transactions from which pagination continues.
+    private var currentOffset: Int = .zero
+    
+    /// Stops pagination if all transactions have been received.
+    private var isAllTransactionReceived: Bool = false
+    
+    /// Sections with transactions grouped by day.
     private var sections = [GroupedSection<Date, Transaction>]()
+    
+    /// Transactions from all sections.
+    private var rows: [Transaction] {
+        sections.reduce([], { $0 + $1.rows })
+    }
     
     // MARK: - BalanceView
     
@@ -100,7 +116,7 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         super.viewDidLoad()
         setup()
         constraints()
-        fetchAllTransactions()
+        fetchTransactions(withPagination: true, limit: paginationLimit, offset: currentOffset)
     }
     
     // MARK: - viewDidAppear
@@ -134,6 +150,7 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.showsVerticalScrollIndicator = false
         tableView.tableHeaderView = balanceView
         
         let appearance = UINavigationBarAppearance()
@@ -292,6 +309,13 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if !isAllTransactionReceived, indexPath.section == sections.indices.last, let section = sections.last, indexPath.row == section.rows.indices.last {
+            currentOffset += 1
+            fetchTransactions(withPagination: true, limit: paginationLimit, offset: currentOffset)
+        }
+    }
 }
 
 // MARK: - Transactions
@@ -300,11 +324,25 @@ extension MainViewController {
     
     // MARK: - Fetch
     
-    private func fetchAllTransactions() {
+    private func fetchTransactions(withPagination: Bool = false, limit: Int, offset: Int = .zero) {
+        let request = Transaction.fetchRequest()
+        request.fetchLimit = limit
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)] // Sort transactions from oldest to newest.
+        request.fetchOffset = offset * limit // Shifts the starting point of transaction retrieval depending on the parameter passed to the function.
+        
         do {
-            let transactions = try context.fetch(Transaction.fetchRequest())
+            let transactions = try context.fetch(request)
             
-            sections = GroupedSection.group(rows: transactions) {
+            if transactions.isEmpty {
+                isAllTransactionReceived = true
+                tableView.backgroundView = sections.isEmpty ? contentUnavailableView : nil
+                tableView.isScrollEnabled = !sections.isEmpty
+                return // No need to update sections or reload data.
+            }
+            
+            let rows = withPagination ? rows + transactions : transactions
+            
+            sections = GroupedSection.group(rows: rows) {
                 guard let from = $0.date, let day = Date.day(from: from) else { return Date.now }
                 return day
             } sorted: {
@@ -314,12 +352,7 @@ extension MainViewController {
 
             sections.sort(by: { $0.headline > $1.headline })
             
-            tableView.backgroundView = sections.isEmpty ? contentUnavailableView : nil
-            tableView.isScrollEnabled = !sections.isEmpty
-            
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
+            tableView.reloadData()
         } catch {
             print(error.localizedDescription)
         }
@@ -358,7 +391,7 @@ extension MainViewController {
         
         do {
             try context.save()
-            fetchAllTransactions()
+            fetchTransactions(limit: rows.count + 1) // Updates rows in table view without pagination, but with a limit of one more than the current number of transactions, for the newly created.
         } catch {
             print(error.localizedDescription)
         }
