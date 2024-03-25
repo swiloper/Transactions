@@ -15,11 +15,7 @@ enum HTTPMethod: String {
     }
 }
 
-protocol Networking {
-    func request<T: Decodable>(link: String, method: HTTPMethod, decode decodable: T.Type) async throws -> T
-}
-
-final class NetworkService: Networking {
+final class NetworkService {
     
     // MARK: - NetworkRequestError
     

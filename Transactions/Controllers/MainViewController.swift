@@ -84,32 +84,6 @@ final class MainViewController: UIViewController, AddTransactionDelegate {
         return label
     }()
     
-    // MARK: - ReplenishAlertController
-    
-    lazy private var replenishAlertController: UIAlertController = {
-        let alert = UIAlertController(title: "Replenish", message: "Specify bitcoin quantity you wish to deposit.", preferredStyle: .alert)
-        alert.addTextField { textField in
-            textField.placeholder = "Enter amount in BTC"
-            textField.keyboardType = .decimalPad
-            textField.addTarget(self, action: #selector(self.alertTextFieldDidChange(_:)), for: .editingChanged)
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        alert.addAction(
-            UIAlertAction(title: "Done", style: .default) { [weak self] _ in
-                if let textFields = alert.textFields, let first = textFields.first, let text = first.text, let amount = Double(text) {
-                    self?.addTransaction(amount: amount, type: .income, category: nil)
-                }
-            }
-        )
-        
-        if let index = alert.actions.firstIndex(where: { $0.title == "Done" }) {
-            alert.actions[index].isEnabled = false
-        }
-        
-        return alert
-    }()
-    
     // MARK: - ErrorAlertController
     
     lazy private var errorAlertController: UIAlertController = {
@@ -259,6 +233,10 @@ extension MainViewController {
     // MARK: - ShowReplenishAlert
     
     @objc private func showReplenishAlert() {
+        let replenishAlertController = UIAlertController.replenishAlertController { amount in
+            self.addTransaction(amount: amount, type: .income, category: nil)
+        }
+        
         if let textFields = replenishAlertController.textFields, let first = textFields.first, let index = replenishAlertController.actions.firstIndex(where: { $0.title == "Done" }) {
             first.text = .empty
             replenishAlertController.actions[index].isEnabled = false
@@ -273,22 +251,6 @@ extension MainViewController {
         let addTransactionViewController = AddTransactionViewController()
         addTransactionViewController.delegate = self
         navigationController?.pushViewController(addTransactionViewController, animated: true)
-    }
-    
-    // MARK: - AlertTextFieldDidChange
-    
-    @objc private func alertTextFieldDidChange(_ sender: UITextField) {
-        var isEnabled = false
-        
-        if let text = sender.text {
-            sender.text = text.replacingOccurrences(of: ",", with: ".")
-            let amount = Double(text)
-            isEnabled = !(amount == nil || amount == .zero)
-        }
-        
-        if let index = replenishAlertController.actions.firstIndex(where: { $0.title == "Done" }) {
-            replenishAlertController.actions[index].isEnabled = isEnabled
-        }
     }
 }
 
